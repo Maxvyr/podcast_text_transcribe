@@ -4,6 +4,7 @@ const path = require('path');
 const Parser = require('rss-parser');
 const axios = require('axios')
 const { Leopard, LeopardActivationLimitReached } = require('@picovoice/leopard-node')
+require('dotenv').config();
 
 const app = express();
 
@@ -21,7 +22,7 @@ app.post('/rss-transcribe', async (req, res) => {
   let feed = {}
   try {
     feed = await parser.parseURL(req.body.rss)
-  } catch(err) {
+  } catch (err) {
     console.log(err)
     res.status(400).send(err)
     return
@@ -39,8 +40,8 @@ app.post('/rss-transcribe', async (req, res) => {
   console.log("Fetching file from " + podcastAudioUrl)
   let dlResponse = {}
   try {
-    dlResponse = await axios.get(podcastAudioUrl, {responseType: "arraybuffer"})
-  } catch(err) {
+    dlResponse = await axios.get(podcastAudioUrl, { responseType: "arraybuffer" })
+  } catch (err) {
     console.error(err)
     res.status(400).send(err)
     return
@@ -54,7 +55,7 @@ app.post('/rss-transcribe', async (req, res) => {
 
   console.log("Transcribing audio...")
   try {
-    const leo = new Leopard("${YOUR ACCESS KEY HERE}")
+    const leo = new Leopard(`${process.env.ACCESS_KEY}`)
     const transcript = leo.processFile(fileName)
     console.log("Transcription complete")
     leo.release()
